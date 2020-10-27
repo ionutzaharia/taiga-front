@@ -1,0 +1,36 @@
+tg-animated-counter {
+    $counter-height: 13px;
+
+    &.vertical {
+        transform: rotate(90deg);
+        writing-mode: horizontal-tb;
+    }
+
+    .animated-counter-inner {
+        height: $counter-height;
+        overflow: hidden;
+        position: relative;
+        text-align: center;
+        width: 100%;
+    }
+
+    .counter-translator {
+        transform: translateY(-$counter-height);
+
+        &.inc {
+            transform: translateY(0);
+            transition: transform .5s;
+        }
+        &.dec {
+            transform: translateY(-($counter-height * 2));
+            transition: transform .5s;
+        }
+    }
+
+    span {
+        display: block;
+        height: $counter-height;
+        overflow: hidden;
+        width: 100%;
+    }
+}

@@ -426,17 +426,22 @@ class KanbanController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.Fi
     prepareBulkUpdateData: (uses, field="kanban_order") ->
         return _.map(uses, (x) -> {"us_id": x.id, "order": x[field]})
 
-    moveUs: (ctx, usList, newStatusId, index) ->
+    moveUs: (ctx, usList, newStatusId, newSwimlaneId, index) ->
         @.cleanSelectedUss()
 
         usList = _.map usList, (us) =>
             return @kanbanUserstoriesService.getUsModel(us.id)
 
-        @rootscope.$broadcast("kanban:userstories:loaded", usList, newStatusId, index)
+        @rootscope.$broadcast("kanban:userstories:loaded", usList, newStatusId, newSwimlaneId, index)
 
-        data = @kanbanUserstoriesService.move(usList, newStatusId, index)
+        data = @kanbanUserstoriesService.move(usList, newStatusId, newSwimlaneId, index)
 
-        promise = @rs.userstories.bulkUpdateKanbanOrder(@scope.projectId, newStatusId, data.bulkOrders)
+        promise = @rs.userstories.bulkUpdateKanbanOrder(
+            @scope.projectId,
+            newStatusId,
+            newSwimlaneId,
+            data.bulkOrders
+        )
 
         promise.then () =>
             # saving

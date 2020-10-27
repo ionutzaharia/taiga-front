@@ -113,9 +113,9 @@ class KanbanUserstoriesService extends taiga.Service
     assignOrders: (order) ->
         @.order = _.assign(@.order, order)
 
-        @.refresh()
+        @.refresh(false)
 
-    move: (usList, statusId, index) ->
+    move: (usList, statusId, swimlaneId, index) ->
 
         initialLength = usList.length
 
@@ -193,7 +193,7 @@ class KanbanUserstoriesService extends taiga.Service
 
             modifiedUs.push({us_id: us.id, order: us.kanban_order})
 
-        @.refresh()
+        @.refresh(false)
 
         return {
             bulkOrders: modifiedUs.concat(setPreviousOrders, setNextOrders),
@@ -209,7 +209,7 @@ class KanbanUserstoriesService extends taiga.Service
         us.status = statusId
         us.kanban_order = @.order[us.id]
 
-        @.refresh()
+        @.refresh(false)
 
         return {"us_id": us.id, "order": -1}
 
@@ -261,7 +261,7 @@ class KanbanUserstoriesService extends taiga.Service
 
         return us
 
-    refresh: () ->
+    refresh: (refreshUsMap = true) ->
         @.userstoriesRaw = _.sortBy @.userstoriesRaw, (it) => @.order[it.id]
 
         collection = {}
@@ -272,7 +272,9 @@ class KanbanUserstoriesService extends taiga.Service
                 collection[usModel.status] = []
 
             collection[usModel.status].push(usModel.id)
-            @.usMap = @.usMap.set(usModel.id, Immutable.fromJS(us))
+
+            if refreshUsMap
+                @.usMap = @.usMap.set(usModel.id, Immutable.fromJS(us))
 
         @.usByStatus = Immutable.fromJS(collection)
 
